@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            padding: 20px;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(25, 25, 35, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .calculator::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(7, 240, 224, 0.1), rgba(0, 217, 255, 0.1));
+            transform: rotate(0deg);
+            z-index: -1;
+            animation: animate 10s linear infinite;
+        }
+
+        @keyframes animate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .display {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            text-align: right;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .display::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 234, 255, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .previous-operand {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            min-height: 1.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .current-operand {
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 300;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 15px;
+        }
+
+        button {
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: rgba(30, 30, 40, 0.9);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 15px;
+        }
+
+        button:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .operator {
+            background: rgba(0, 150, 200, 0.3);
+            color: #00d9ff;
+            font-weight: 600;
+        }
+
+        .equals {
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            color: #fff;
+            grid-column: span 2;
+            font-weight: 600;
+        }
+
+        .clear, .delete {
+            background: rgba(200, 50, 50, 0.3);
+            color: #ff4d4d;
+        }
+
+        .number {
+            background: rgba(20, 20, 30, 0.9);
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        /* Hover effects */
+        button:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            button {
+                padding: 15px;
+                font-size: 1.2rem;
+                border-radius: 12px;
+            }
+            
+            .display {
+                padding: 15px;
+                min-height: 100px;
+            }
+            
+            .current-operand {
+                font-size: 2rem;
+            }
+            
+            .previous-operand {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animation for button presses */
+        @keyframes press {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(0.95);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        button:active {
+            animation: press 0.2s ease;
+        }
+
+        /* Footer styling */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="previous-operand"></div>
+            <div class="current-operand">0</div>
+        </div>
+        <div class="buttons">
+            <button class="clear">C</button>
+            <button class="delete">DEL</button>
+            <button class="operator">%</button>
+            <button class="operator">÷</button>
+            
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator">×</button>
+            
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator">-</button>
+            
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operator">+</button>
+            
+            <button class="number zero">0</button>
+            <button class="number">.</button>
+            <button class="equals">=</button>
+        </div>
+        <div class="footer">
+            Futuristic Calculator © 2023
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const displayPrevious = document.querySelector('.previous-operand');
+            const displayCurrent = document.querySelector('.current-operand');
+            const buttons = document.querySelectorAll('button');
+            
+            let currentOperand = '';
+            let previousOperand = '';
+            let operation = undefined;
+            
+            // Add event listeners to all buttons
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const buttonText = button.textContent;
+                    
+                    // Handle number buttons
+                    if (button.classList.contains('number')) {
+                        appendNumber(buttonText);
+                    }
+                    
+                    // Handle operator buttons
+                    if (button.classList.contains('operator')) {
+                        chooseOperation(buttonText);
+                    }
+                    
+                    // Handle equals button
+                    if (button.classList.contains('equals')) {
+                        compute();
+                    }
+                    
+                    // Handle clear button
+                    if (button.classList.contains('clear')) {
+                        clear();
+                    }
+                    
+                    // Handle delete button
+                    if (button.classList.contains('delete')) {
+                        deleteNumber();
+                    }
+                    
+                    updateDisplay();
+                });
+            });
+            
+            // Append number to current operand
+            function appendNumber(number) {
+                // Prevent multiple decimal points
+                if (number === '.' && currentOperand.includes('.')) return;
+                
+                // Replace initial 0 with number unless it's a decimal
+                if (currentOperand === '0' && number !== '.') {
+                    currentOperand = number;
+                    return;
+                }
+                
+                currentOperand += number;
+            }
+            
+            // Choose operation
+            function chooseOperation(op) {
+                if (currentOperand === '') return;
+                
+                if (previousOperand !== '') {
+                    compute();
+                }
+                
+                operation = op;
+                previousOperand = currentOperand;
+                currentOperand = '';
+            }
+            
+            // Perform calculation
+            function compute() {
+                let computation;
+                const prev = parseFloat(previousOperand);
+                const current = parseFloat(currentOperand);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (operation) {
+                    case '+':
+                        computation = prev + current;
+                        break;
+                    case '-':
+                        computation = prev - current;
+                        break;
+                    case '×':
+                        computation = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            computation = 'Error';
+                        } else {
+                            computation = prev / current;
+                        }
+                        break;
+                    case '%':
+                        computation = prev % current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                currentOperand = computation.toString();
+                operation = undefined;
+                previousOperand = '';
+            }
+            
+            // Clear the calculator
+            function clear() {
+                currentOperand = '0';
+                previousOperand = '';
+                operation = undefined;
+            }
+            
+            // Delete the last digit
+            function deleteNumber() {
+                currentOperand = currentOperand.toString().slice(0, -1);
+                if (currentOperand === '') {
+                    currentOperand = '0';
+                }
+            }
+            
+            // Update the display
+            function updateDisplay() {
+                displayCurrent.textContent = currentOperand;
+                if (operation != null) {
+                    displayPrevious.textContent = `${previousOperand} ${operation}`;
+                } else {
+                    displayPrevious.textContent = previousOperand;
+                }
+            }
+            
+            // Initialize the calculator
+            clear();
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
